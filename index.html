@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14532d">
+  <meta name="description" content="Buy and sell products and services in your community with MobiMarket.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>MobiMarket — Shop your community</title>
+  <style>
+    :root {
+      --green: #14532d;
+      --green-2: #166534;
+      --lime: #d9f99d;
+      --ink: #17221b;
+      --muted: #657268;
+      --paper: #f5f7f2;
+      --white: #ffffff;
+      --line: #e2e8df;
+      --shadow: 0 10px 28px rgba(22, 50, 30, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--paper); color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .topbar { background: var(--green); color: white; padding: 16px 18px; }
+    .topbar-inner { max-width: 1050px; margin: auto; display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 1.18rem; font-weight: 800; letter-spacing: -.3px; }
+    .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; background: var(--lime); color: var(--green); border-radius: 12px; font-weight: 900; }
+    .top-note { font-size: .85rem; color: #e1f5e5; }
+    main { max-width: 1050px; margin: auto; padding: 22px 16px 50px; }
+    .hero {
+      border-radius: 24px; padding: clamp(22px, 5vw, 44px);
+      background: linear-gradient(120deg, #dcfce7, #f0fdf4 58%, #ecfccb);
+      display: grid; grid-template-columns: 1.4fr .6fr; gap: 16px; align-items: center;
+      overflow: hidden;
+    }
+    .eyebrow { color: var(--green-2); font-weight: 800; font-size: .78rem; text-transform: uppercase; letter-spacing: 1.2px; }
+    h1 { font-size: clamp(2rem, 6vw, 3.35rem); line-height: 1.04; letter-spacing: -1.5px; margin: 10px 0 12px; }
+    .hero p { color: #405747; max-width: 520px; margin: 0 0 18px; }
+    .hero-art { font-size: clamp(4rem, 12vw, 7.5rem); text-align: center; filter: drop-shadow(0 10px 8px #14532d18); }
+    .search-row { display: flex; gap: 9px; max-width: 620px; }
+    .search-row input { flex: 1; min-width: 0; }
+    input, select, textarea {
+      width: 100%; border: 1px solid #d5ded4; background: white; color: var(--ink);
+      border-radius: 12px; padding: 12px 13px; outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #15803d; box-shadow: 0 0 0 3px #22c55e20; }
+    .btn { border: 0; border-radius: 12px; padding: 11px 16px; font-weight: 750; transition: transform .15s, background .15s; }
+    .btn:active { transform: scale(.98); }
+    .btn-primary { background: var(--green); color: white; }
+    .btn-primary:hover { background: #0f4224; }
+    .btn-light { background: white; color: var(--green); border: 1px solid #c9ddcb; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; margin: 28px 0 14px; }
+    h2 { margin: 0; font-size: 1.45rem; letter-spacing: -.5px; }
+    .section-sub { color: var(--muted); font-size: .9rem; margin-top: 3px; }
+    .category-list { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip { background: white; border: 1px solid var(--line); border-radius: 999px; padding: 8px 13px; color: #3e5143; font-size: .9rem; font-weight: 700; }
+    .chip.active { background: var(--green); border-color: var(--green); color: white; }
+    .listing-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; }
+    .card { background: white; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; min-width: 0; }
+    .product-art { min-height: 145px; display: grid; place-items: center; font-size: 4rem; background: linear-gradient(135deg, #ecfccb, #f0fdf4); position: relative; }
+    .category-tag { position: absolute; top: 10px; left: 10px; background: #ffffffdf; color: var(--green); font-size: .73rem; font-weight: 800; padding: 5px 9px; border-radius: 999px; }
+    .card-body { padding: 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .card h3 { margin: 0; font-size: 1.04rem; line-height: 1.3; }
+    .price { color: var(--green-2); font-size: 1.25rem; font-weight: 850; }
+    .meta { color: var(--muted); font-size: .84rem; display: flex; flex-wrap: wrap; gap: 5px 10px; }
+    .description { font-size: .9rem; color: #4b5a4e; margin: 0; flex: 1; }
+    .seller-line { font-size: .82rem; color: #59685d; border-top: 1px solid #edf1eb; padding-top: 9px; }
+    .card-actions { display: flex; gap: 8px; margin-top: 3px; }
+    .card-actions .btn { flex: 1; padding: 9px 10px; font-size: .88rem; }
+    .empty { grid-column: 1 / -1; text-align: center; background: white; border: 1px dashed #cad8ca; padding: 32px 16px; border-radius: 18px; color: var(--muted); }
+    .add-panel { margin-top: 30px; background: white; border: 1px solid var(--line); border-radius: 20px; padding: clamp(17px, 4vw, 26px); box-shadow: var(--shadow); }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin-top: 17px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: .88rem; font-weight: 750; color: #394a3c; }
+    .field.full { grid-column: 1 / -1; }
+    .form-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 15px; }
+    .notice { font-size: .85rem; color: var(--muted); margin: 12px 0 0; }
+    footer { max-width: 1050px; margin: auto; padding: 0 16px 28px; color: var(--muted); font-size: .82rem; text-align: center; }
+    .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: #16251a; color: white; padding: 12px 16px; border-radius: 12px; box-shadow: var(--shadow); z-index: 10; max-width: calc(100vw - 30px); display: none; }
+    .toast.show { display: block; }
+    @media (max-width: 720px) {
+      main { padding: 15px 12px 35px; }
+      .hero { grid-template-columns: 1fr; gap: 0; border-radius: 20px; }
+      .hero-art { display: none; }
+      .top-note { display: none; }
+      .listing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .product-art { min-height: 112px; font-size: 3.2rem; }
+      .card-body { padding: 11px; gap: 7px; }
+      .card h3 { font-size: .97rem; }
+      .card-actions { flex-direction: column; }
+      .section-head { align-items: start; flex-direction: column; }
+    }
+    @media (max-width: 390px) {
+      .listing-grid { grid-template-columns: 1fr; }
+      .product-art { min-height: 135px; }
+      .search-row { flex-direction: column; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="brand-mark">M</span><span>MobiMarket</span></div>
+      <div class="top-note">Local finds. Community sellers.</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Your community marketplace</div>
+        <h1>Good finds are<br>closer than you think.</h1>
+        <p>Discover products and services from people around your community. Buy local, support local.</p>
+        <div class="search-row">
+          <input id="searchInput" type="search" placeholder="Search phones, clothes, services..." aria-label="Search listings">
+          <button class="btn btn-primary" id="searchBtn">Search</button>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">🛍️</div>
+    </section>
+
+    <section aria-labelledby="categoryTitle">
+      <div class="section-head">
+        <div><h2 id="categoryTitle">Browse categories</h2><div class="section-sub">Find what you need faster.</div></div>
+      </div>
+      <div class="category-list" id="categoryList"></div>
+    </section>
+
+    <section aria-labelledby="listingTitle">
+      <div class="section-head">
+        <div><h2 id="listingTitle">Popular near you</h2><div class="section-sub" id="resultCount">Browse community listings.</div></div>
+        <button class="btn btn-light" id="showAllBtn">Show all</button>
+      </div>
+      <div class="listing-grid" id="listingGrid"></div>
+    </section>
+
+    <section class="add-panel" id="addListing">
+      <div class="eyebrow">Selling something?</div>
+      <h2 style="margin-top:5px">Add a listing</h2>
+      <p class="section-sub">Add a sample listing to test how MobiMarket works on your phone.</p>
+      <form id="listingForm">
+        <div class="form-grid">
+          <div class="field">
+            <label for="itemName">Product or service name *</label>
+            <input id="itemName" name="itemName" required maxlength="70" placeholder="e.g. School shoes">
+          </div>
+          <div class="field">
+            <label for="itemPrice">Price in rand (R) *</label>
+            <input id="itemPrice" name="itemPrice" required type="number" min="0" max="10000000" step="0.01" placeholder="e.g. 150">
+          </div>
+          <div class="field">
+            <label for="itemCategory">Category *</label>
+            <select id="itemCategory" name="itemCategory" required>
+              <option value="Clothing">Clothing</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Home">Home</option>
+              <option value="Services">Services</option>
+              <option value="Food">Food</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="sellerName">Seller name *</label>
+            <input id="sellerName" name="sellerName" required maxlength="50" placeholder="e.g. Thabo">
+          </div>
+          <div class="field full">
+            <label for="itemDescription">Short description *</label>
+            <textarea id="itemDescription" name="itemDescription" required maxlength="240" rows="3" placeholder="Describe the item, condition, or service..."></textarea>
+          </div>
+          <div class="field full">
+            <label for="itemArea">Community / area</label>
+            <input id="itemArea" name="itemArea" maxlength="60" placeholder="e.g. My community">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">＋ Add listing</button>
+          <button class="btn btn-light" type="reset">Clear form</button>
+        </div>
+      </form>
+      <p class="notice">Demo note: don't enter private information. This prototype saves listings only in this browser on this device.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>MobiMarket</strong> · A beginner coding project made with HTML, CSS and JavaScript.</p>
+    <p>Meet sellers safely in public places. Check items carefully and never send money to strangers before verifying a deal.</p>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const STORAGE_KEY = "mobimarket-listings-v1";
+    const starterListings = [
+      { id: "sample-1", name: "Wireless Headphones", price: 220, category: "Electronics", seller: "Lebo's Finds", area: "My community", description: "Comfortable headphones for music and videos.", emoji: "🎧", sample: true },
+      { id: "sample-2", name: "Everyday Sneakers", price: 300, category: "Clothing", seller: "Fresh Steps", area: "My community", description: "Casual sneakers for everyday wear.", emoji: "👟", sample: true },
+      { id: "sample-3", name: "Home Baking", price: 80, category: "Food", seller: "Mama's Kitchen", area: "My community", description: "Fresh cupcakes and treats. Price is a starting example.", emoji: "🧁", sample: true },
+      { id: "sample-4", name: "Study Desk", price: 450, category: "Home", seller: "K's Home Goods", area: "My community", description: "A simple desk for studying or working.", emoji: "🪑", sample: true },
+      { id: "sample-5", name: "Hair Braiding", price: 180, category: "Services", seller: "Styled by N", area: "My community", description: "Braiding service. Ask the seller about available styles.", emoji: "💇🏽", sample: true },
+      { id: "sample-6", name: "Phone Case", price: 60, category: "Electronics", seller: "Pocket Picks", area: "My community", description: "Protective phone case; check your phone model first.", emoji: "📱", sample: true }
+    ];
+    const categories = ["All", "Clothing", "Electronics", "Home", "Services", "Food", "Other"];
+    let selectedCategory = "All";
+    let listings = loadListings();
+
+    function loadListings() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved !== null) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (error) {
+        console.warn("Could not load saved listings:", error);
+      }
+      return starterListings.map(item => ({ ...item }));
+    }
+
+    function saveListings() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(listings));
+        return true;
+      } catch (error) {
+        showToast("This browser could not save your listing. You can still test it for now.");
+        return false;
+      }
+    }
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[character]));
+    }
+
+    function money(value) {
+      return new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR", maximumFractionDigits: 2 }).format(Number(value) || 0);
+    }
+
+    function renderCategories() {
+      const holder = document.getElementById("categoryList");
+      holder.innerHTML = categories.map(category => `
+        <button class="chip ${category === selectedCategory ? "active" : ""}" data-category="${escapeHTML(category)}" aria-pressed="${category === selectedCategory}">
+          ${category === "All" ? "✨ " : ""}${escapeHTML(category)}
+        </button>`).join("");
+      holder.querySelectorAll("button").forEach(button => {
+        button.addEventListener("click", () => {
+          selectedCategory = button.dataset.category;
+          renderCategories();
+          renderListings();
+        });
+      });
+    }
+
+    function renderListings() {
+      const searchTerm = document.getElementById("searchInput").value.trim().toLowerCase();
+      const filtered = listings.filter(item => {
+        const categoryMatch = selectedCategory === "All" || item.category === selectedCategory;
+        const searchable = [item.name, item.category, item.seller, item.area, item.description].join(" ").toLowerCase();
+        return categoryMatch && searchable.includes(searchTerm);
+      });
+      document.getElementById("resultCount").textContent = `${filtered.length} ${filtered.length === 1 ? "listing" : "listings"} found`;
+      const grid = document.getElementById("listingGrid");
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty"><div style="font-size:2rem">🔎</div><strong>No listings found</strong><p>Try another search or category.</p><button class="btn btn-light" id="resetFilters">Reset filters</button></div>`;
+        document.getElementById("resetFilters").addEventListener("click", resetFilters);
+        return;
+      }
+      grid.innerHTML = filtered.map(item => `
+        <article class="card">
+          <div class="product-art" aria-hidden="true">
+            <span class="category-tag">${escapeHTML(item.category)}</span>
+            ${escapeHTML(item.emoji || "🛍️")}
+          </div>
+          <div class="card-body">
+            <h3>${escapeHTML(item.name)}</h3>
+            <div class="price">${money(item.price)}</div>
+            <div class="meta"><span>📍 ${escapeHTML(item.area || "My community")}</span></div>
+            <p class="description">${escapeHTML(item.description)}</p>
+            <div class="seller-line">Seller: <strong>${escapeHTML(item.seller)}</strong>${item.sample ? " · Sample" : ""}</div>
+            <div class="card-actions">
+              <button class="btn btn-primary" data-contact="${escapeHTML(item.id)}">View details</button>
+              ${item.sample ? "" : `<button class="btn btn-light" data-delete="${escapeHTML(item.id)}" aria-label="Delete ${escapeHTML(item.name)}">Delete</button>`}
+            </div>
+          </div>
+        </article>`).join("");
+      grid.querySelectorAll("[data-contact]").forEach(button => {
+        button.addEventListener("click", () => {
+          const item = listings.find(listing => listing.id === button.dataset.contact);
+          if (item) showToast(`${item.name} — ${money(item.price)}. Seller: ${item.seller}. This demo has no messaging system yet.`);
+        });
+      });
+      grid.querySelectorAll("[data-delete]").forEach(button => {
+        button.addEventListener("click", () => {
+          const item = listings.find(listing => listing.id === button.dataset.delete);
+          if (!item || !confirm(`Delete your listing "${item.name}"?`)) return;
+          listings = listings.filter(listing => listing.id !== item.id);
+          saveListings();
+          renderListings();
+          showToast("Listing deleted.");
+        });
+      });
+    }
+
+    function resetFilters() {
+      selectedCategory = "All";
+      document.getElementById("searchInput").value = "";
+      renderCategories();
+      renderListings();
+    }
+
+    let toastTimer;
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 3200);
+    }
+
+    document.getElementById("searchInput").addEventListener("input", renderListings);
+    document.getElementById("searchBtn").addEventListener("click", renderListings);
+    document.getElementById("showAllBtn").addEventListener("click", resetFilters);
+
+    document.getElementById("listingForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const name = document.getElementById("itemName").value.trim();
+      const price = Number(document.getElementById("itemPrice").value);
+      const category = document.getElementById("itemCategory").value;
+      const seller = document.getElementById("sellerName").value.trim();
+      const description = document.getElementById("itemDescription").value.trim();
+      const area = document.getElementById("itemArea").value.trim() || "My community";
+      if (!name || !seller || !description || !Number.isFinite(price) || price < 0) {
+        showToast("Please fill in all required fields with a valid price.");
+        return;
+      }
+      const emojiByCategory = { Clothing: "👕", Electronics: "📱", Home: "🏠", Services: "🛠️", Food: "🍲", Other: "🛍️" };
+      listings.unshift({
+        id: "user-" + Date.now() + "-" + Math.random().toString(16).slice(2),
+        name, price, category, seller, description, area,
+        emoji: emojiByCategory[category] || "🛍️",
+        sample: false
+      });
+      saveListings();
+      event.target.reset();
+      selectedCategory = "All";
+      document.getElementById("searchInput").value = "";
+      renderCategories();
+      renderListings();
+      document.getElementById("listingTitle").scrollIntoView({ behavior: "smooth", block: "start" });
+      showToast("Your listing has been added on this device!");
+    });
+
+    renderCategories();
+    renderListings();
+  </script>
+  <script>
+    if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").catch(error => {
+          console.warn("Offline support could not be enabled:", error);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
